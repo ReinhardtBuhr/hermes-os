@@ -1,0 +1,731 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HERMES OS — Knowledge Graph Styles
+   Force-directed graph visualization theming
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Graph Container ──────────────────────────────────────────── */
+.graph-container {
+  width: 100%;
+  height: 100%;
+  min-height: 450px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 240, 255, 0.02) 0%,
+    transparent 70%
+  );
+}
+
+.graph-view {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 50% 48%, rgba(0, 240, 255, 0.08), transparent 34%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: auto, 34px 34px, 34px 34px;
+}
+
+.graph-svg {
+  width: 100%;
+  min-height: 500px;
+  display: block;
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none; /* d3.zoom owns touch gestures */
+}
+
+.graph-canvas:active {
+  cursor: grabbing;
+}
+
+
+/* ── Graph Nodes ──────────────────────────────────────────────── */
+.graph-node {
+  cursor: pointer;
+  transition:
+    r var(--transition-fast),
+    stroke-width var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.graph-node:hover {
+  filter: url(#glow-strong);
+  stroke-width: 3;
+}
+
+.graph-node.system {
+  fill: var(--bg-tertiary);
+  stroke: var(--accent-cyan);
+  stroke-width: 2;
+  filter: url(#glow-cyan);
+}
+
+.graph-node.file {
+  fill: var(--bg-tertiary);
+  stroke: var(--accent-purple);
+  stroke-width: 2;
+  filter: url(#glow-purple);
+}
+
+.graph-node.analytics {
+  fill: var(--bg-tertiary);
+  stroke: var(--accent-green);
+  stroke-width: 2;
+  filter: url(#glow-green);
+}
+
+.graph-node.concept {
+  fill: var(--bg-tertiary);
+  stroke: var(--accent-amber);
+  stroke-width: 2;
+  filter: url(#glow-amber);
+}
+
+.graph-node.person {
+  fill: var(--bg-tertiary);
+  stroke: var(--accent-blue);
+  stroke-width: 2;
+  filter: url(#glow-blue);
+}
+
+.graph-node.selected {
+  stroke-width: 3.5;
+  r: 12;
+}
+
+.graph-node.dimmed {
+  opacity: 0.15;
+}
+
+.graph-node.highlighted {
+  opacity: 1;
+  stroke-width: 3;
+}
+
+
+/* ── Graph Links ──────────────────────────────────────────────── */
+.graph-link {
+  stroke: rgba(0, 240, 255, 0.12);
+  stroke-width: 1;
+  fill: none;
+  transition: stroke-opacity var(--transition-fast), stroke var(--transition-fast);
+}
+
+.graph-link:hover {
+  stroke: rgba(0, 240, 255, 0.4);
+  stroke-width: 1.5;
+}
+
+.graph-link.dimmed {
+  stroke-opacity: 0.04;
+}
+
+.graph-link.highlighted {
+  stroke: rgba(0, 240, 255, 0.35);
+  stroke-width: 1.5;
+}
+
+.graph-link.strong {
+  stroke-width: 2;
+  stroke: rgba(0, 240, 255, 0.2);
+}
+
+
+/* ── Graph Labels ─────────────────────────────────────────────── */
+.graph-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  fill: var(--text-secondary);
+  pointer-events: none;
+  user-select: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+}
+
+.graph-label.dimmed {
+  opacity: 0.1;
+}
+
+.graph-label.highlighted {
+  opacity: 1;
+  fill: var(--text-primary);
+  font-weight: 500;
+}
+
+
+/* ── Graph Tooltip ────────────────────────────────────────────── */
+.graph-tooltip {
+  position: absolute;
+  background: rgba(15, 20, 40, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  pointer-events: none;
+  z-index: 100;
+  min-width: 180px;
+  max-width: 260px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 240, 255, 0.08);
+}
+
+.graph-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.graph-tooltip-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-tooltip-type {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.graph-tooltip-type.system    { background: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.graph-tooltip-type.file      { background: var(--accent-purple-dim); color: var(--accent-purple); }
+.graph-tooltip-type.analytics { background: var(--accent-green-dim); color: var(--accent-green); }
+.graph-tooltip-type.concept   { background: var(--accent-amber-dim); color: var(--accent-amber); }
+.graph-tooltip-type.person    { background: var(--accent-blue-dim); color: var(--accent-blue); }
+
+.graph-tooltip-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.graph-tooltip-meta {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: var(--space-md);
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+
+/* ── Graph Controls Overlay ───────────────────────────────────── */
+.graph-controls {
+  position: absolute;
+  bottom: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.graph-control-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: rgba(15, 20, 40, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.graph-control-btn:hover {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-cyan);
+  border-color: var(--border-active);
+}
+
+.graph-control-btn:active {
+  transform: scale(0.92);
+}
+
+.graph-controls .btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(15, 20, 40, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.graph-controls .btn:hover {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-cyan);
+  border-color: var(--border-active);
+}
+
+.graph-controls .btn:active {
+  transform: scale(0.92);
+}
+
+.graph-controls-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 2px 0;
+}
+
+
+/* ── Graph Stats Overlay ──────────────────────────────────────── */
+.graph-stats {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  gap: var(--space-md);
+  z-index: 10;
+}
+
+.graph-stats-overlay {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 10;
+  padding: 7px 10px;
+  background: rgba(15, 20, 40, 0.82);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.graph-trace-overlay {
+  position: absolute;
+  left: var(--space-md);
+  bottom: var(--space-md);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(420px, calc(100% - 110px));
+  padding: 7px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 20, 40, 0.84);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.graph-trace-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.55);
+  flex-shrink: 0;
+}
+
+.graph-trace-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.graph-trace-overlay.is-active {
+  border-color: rgba(0, 240, 255, 0.24);
+  color: var(--text-primary);
+}
+
+.graph-stats-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(15, 20, 40, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.graph-stats-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
+
+/* ── Graph Legend ──────────────────────────────────────────────── */
+.graph-legend {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(15, 20, 40, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  z-index: 10;
+}
+
+.legend-item,
+.graph-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend-dot,
+.graph-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  white-space: nowrap;
+}
+
+.tooltip-header {
+  margin-bottom: var(--space-sm);
+}
+
+.tooltip-name {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.tooltip-type {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tooltip-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.tooltip-stat-value {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-align: right;
+  max-width: 150px;
+  overflow-wrap: anywhere;
+}
+
+.graph-legend-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.graph-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.graph-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.graph-legend-dot.system    { background: var(--accent-cyan); box-shadow: 0 0 6px rgba(0, 240, 255, 0.5); }
+.graph-legend-dot.file      { background: var(--accent-purple); box-shadow: 0 0 6px rgba(123, 47, 255, 0.5); }
+.graph-legend-dot.analytics { background: var(--accent-green); box-shadow: 0 0 6px rgba(0, 255, 136, 0.5); }
+.graph-legend-dot.concept   { background: var(--accent-amber); box-shadow: 0 0 6px rgba(255, 159, 28, 0.5); }
+.graph-legend-dot.person    { background: var(--accent-blue); box-shadow: 0 0 6px rgba(59, 130, 246, 0.5); }
+
+
+/* ── SVG Glow Filters ─────────────────────────────────────────── */
+/*
+  These filter definitions should be placed as inline <defs> in the SVG.
+  The CSS references them via url(#filter-id).
+  
+  <defs>
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feFlood flood-color="#00f0ff" flood-opacity="0.4" />
+      <feComposite in2="blur" operator="in" />
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="glow-purple" ...>
+    <filter id="glow-green" ...>
+    <filter id="glow-amber" ...>
+    <filter id="glow-blue" ...>
+    <filter id="glow-strong" ...>
+  </defs>
+*/
+
+
+/* ── Node Pulse Animation ─────────────────────────────────────── */
+.node-pulse {
+  animation: nodePulse 1.5s ease-out;
+}
+
+@keyframes nodePulse {
+  0% {
+    r: 4;
+    stroke-width: 6;
+    stroke-opacity: 0.8;
+  }
+  50% {
+    stroke-opacity: 0.3;
+  }
+  100% {
+    r: 8;
+    stroke-width: 2;
+    stroke-opacity: 1;
+  }
+}
+
+/* Node entrance */
+.node-enter {
+  animation: nodeEnter 0.5s var(--transition-spring) forwards;
+  opacity: 0;
+}
+
+@keyframes nodeEnter {
+  from {
+    opacity: 0;
+    r: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* ── Edge Particle ────────────────────────────────────────────── */
+.edge-particle {
+  fill: var(--accent-cyan);
+  opacity: 0;
+  animation: edgeParticleFlow 3s linear infinite;
+}
+
+@keyframes edgeParticleFlow {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* SVG-based particle along path */
+.edge-particle-dot {
+  r: 1.5;
+  fill: var(--accent-cyan);
+  filter: url(#glow-cyan);
+}
+
+
+/* ── Community Halo ───────────────────────────────────────────── */
+.community-halo {
+  fill: none;
+  stroke-width: 1;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.community-halo.system    { stroke: var(--accent-cyan); fill: rgba(0, 240, 255, 0.02); }
+.community-halo.file      { stroke: var(--accent-purple); fill: rgba(123, 47, 255, 0.02); }
+.community-halo.analytics { stroke: var(--accent-green); fill: rgba(0, 255, 136, 0.02); }
+.community-halo.concept   { stroke: var(--accent-amber); fill: rgba(255, 159, 28, 0.02); }
+
+
+/* ── Graph Search / Filter Bar ────────────────────────────────── */
+.graph-search {
+  position: absolute;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  width: 220px;
+  z-index: 10;
+}
+
+.graph-search input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(15, 20, 40, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.graph-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.graph-search input:focus {
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.08);
+}
+
+
+/* ── Minimap ──────────────────────────────────────────────────── */
+.graph-minimap {
+  position: absolute;
+  bottom: var(--space-md);
+  right: 52px;
+  width: 120px;
+  height: 80px;
+  background: rgba(15, 20, 40, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  z-index: 10;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.graph-minimap:hover {
+  opacity: 1;
+}
+
+.graph-minimap svg {
+  width: 100%;
+  height: 100%;
+}
+
+.graph-minimap-viewport {
+  fill: none;
+  stroke: var(--accent-cyan);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+
+/* ── Empty State ──────────────────────────────────────────────── */
+.graph-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  color: var(--text-muted);
+}
+
+.graph-empty-icon {
+  font-size: 48px;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+.graph-empty-text {
+  font-size: 14px;
+  text-align: center;
+  max-width: 240px;
+}
+
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .graph-legend {
+    display: none;
+  }
+
+  .graph-stats {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .graph-minimap {
+    display: none;
+  }
+
+  .graph-search {
+    width: 160px;
+  }
+}

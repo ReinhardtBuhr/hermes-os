@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Council — Mission Control</title>
+  <meta name="description" content="Hermes OS is your personal mission control dashboard. A knowledge-graph-powered operating system overseen by the Hermes AI Agent." />
+  <meta name="theme-color" content="#0a0e1a" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:title" content="Research Council — Mission Control" />
+  <meta property="og:description" content="Knowledge-graph-powered personal operating system with AI overseer." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/src/styles/index.css" />
+  <link rel="stylesheet" href="/src/styles/graph.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Particle background canvas -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Main app shell loads here via JS -->
+    <div id="hermes-os-root"></div>
+
+    <!-- Loading screen -->
+    <div id="loading-screen">
+      <div class="loading-content">
+        <div class="hermes-logo-loader">
+          <div class="logo-ring"></div>
+          <div class="logo-ring"></div>
+          <div class="logo-ring"></div>
+          <div class="logo-core"></div>
+        </div>
+        <h1 class="loading-title">RESEARCH COUNCIL</h1>
+        <p class="loading-subtitle">Convening the council...</p>
+        <div class="loading-bar">
+          <div class="loading-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

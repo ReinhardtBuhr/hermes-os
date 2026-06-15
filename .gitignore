@@ -1,0 +1,45 @@
+# === Dependencies (re-installed with `npm install`) ===
+node_modules/
+
+# === Build output (regenerated with `npm run build`) ===
+dist/
+
+# === Third-party vendored agent (Nous Research, MIT) ===
+# 164 MB with its own git history — clone separately, see README.
+vendor/
+
+# === Personal data — NEVER commit ===
+# SQLite databases hold your knowledge graph, memory, conversations.
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+server/hermes.db*
+
+# User-uploaded files
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Agent scratch space
+server/.brain-workdir/*
+!server/.brain-workdir/.gitkeep
+
+# === Secrets ===
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+
+# === Logs ===
+*.log
+logs/
+
+# === OS / editor junk ===
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.idea/
+*.swp
